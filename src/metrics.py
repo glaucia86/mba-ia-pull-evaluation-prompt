@@ -25,7 +25,7 @@ Configure o provider no arquivo .env através da variável LLM_PROVIDER.
 import os
 import json
 import re
-from typing import Dict, Any
+from typing import Dict, Any, List, Union
 from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage, HumanMessage
 from utils import get_eval_llm
@@ -41,27 +41,60 @@ def get_evaluator_llm():
     return get_eval_llm(temperature=0)
 
 
-def extract_json_from_response(response_text: str) -> Dict[str, Any]:
+LLMResponseContent = Union[str, List[Union[str, Dict[Any, Any]]]]
+
+
+def _normalize_response_text(response_text: LLMResponseContent) -> str:
+    """
+    Normaliza respostas de LLM para texto simples.
+    Alguns providers retornam lista de blocos em vez de string.
+    """
+    if isinstance(response_text, str):
+        return response_text
+
+    text_parts: List[str] = []
+
+    for item in response_text:
+        if isinstance(item, str):
+            text_parts.append(item)
+            continue
+
+        if isinstance(item, dict):
+            text_value = item.get("text")
+            if isinstance(text_value, str):
+                text_parts.append(text_value)
+            else:
+                text_parts.append(json.dumps(item, ensure_ascii=False))
+            continue
+
+        text_parts.append(str(item))
+
+    return "\n".join(text_parts)
+
+
+def extract_json_from_response(response_text: LLMResponseContent) -> Dict[str, Any]:
     """
     Extrai JSON de uma resposta de LLM que pode conter texto adicional.
     """
+    normalized_text = _normalize_response_text(response_text)
+
     try:
         # Tentar parsear diretamente
-        return json.loads(response_text)
+        return json.loads(normalized_text)
     except json.JSONDecodeError:
         # Tentar encontrar JSON no meio do texto
-        start = response_text.find('{')
-        end = response_text.rfind('}') + 1
+        start = normalized_text.find('{')
+        end = normalized_text.rfind('}') + 1
 
         if start != -1 and end > start:
             try:
-                json_str = response_text[start:end]
+                json_str = normalized_text[start:end]
                 return json.loads(json_str)
             except json.JSONDecodeError:
                 pass
 
         # Se não conseguir extrair, retornar valores default
-        print(f"⚠️  Não foi possível extrair JSON da resposta: {response_text[:200]}...")
+        print(f"⚠️  Não foi possível extrair JSON da resposta: {normalized_text[:200]}...")
         return {"score": 0.0, "reasoning": "Erro ao processar resposta"}
 
 
@@ -130,7 +163,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         precision = float(result.get("precision", 0.0))
         recall = float(result.get("recall", 0.0))
@@ -227,7 +260,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         score = float(result.get("score", 0.0))
 
@@ -314,7 +347,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         score = float(result.get("score", 0.0))
 
@@ -399,7 +432,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         score = float(result.get("score", 0.0))
 
@@ -487,7 +520,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         score = float(result.get("score", 0.0))
 
@@ -577,7 +610,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         score = float(result.get("score", 0.0))
 
@@ -677,7 +710,7 @@ NÃO adicione nenhum texto antes ou depois do JSON.
     try:
         llm = get_evaluator_llm()
         response = llm.invoke([HumanMessage(content=evaluator_prompt)])
-        result = extract_json_from_response(response.content)
+        result = extract_json_from_response(_normalize_response_text(response.content))
 
         score = float(result.get("score", 0.0))
 
