@@ -22,27 +22,40 @@ Repositorio com implementacao completa do fluxo de otimizar prompts do LangSmith
 
 ## Resultados Finais
 
+### Criterio de aprovacao do desafio (gate oficial)
+
+Nesta implementacao, o gate de aprovacao considera as 4 metricas obrigatorias do desafio:
+
+- Tone Score >= 0.9
+- Acceptance Criteria Score >= 0.9
+- User Story Format Score >= 0.9
+- Completeness Score >= 0.9
+- Media das 4 metricas >= 0.9
+
+As metricas F1-Score, Clarity e Precision permanecem como diagnostico para iteracao de prompt.
+
 ### Dashboard e links publicos
 
 - Dashboard do projeto no LangSmith: https://smith.langchain.com/projects/prompt-optimization-challenge
 - Prompt otimizado publicado: https://smith.langchain.com/hub/glaucia86/bug_to_user_story_v2
 
-### Tabela comparativa (prompt ruim v1 vs prompt otimizado v2)
+### Tabela comparativa diagnostica (prompt ruim v1 vs prompt otimizado v2)
 
-Abaixo, comparacao no mesmo fluxo de avaliacao (`src/evaluate.py`), com o mesmo dataset e mesmas metricas:
+Abaixo, comparacao de uma rodada diagnostica no mesmo fluxo de avaliacao (`src/evaluate.py`), com o mesmo dataset:
 
 | Prompt | Helpfulness | Correctness | F1-Score | Clarity | Precision | Media Geral | Status |
 |---|---:|---:|---:|---:|---:|---:|---|
 | `leonanluppi/bug_to_user_story_v1` | 0.8233 | 0.8254 | 0.8208 | 0.8167 | 0.8300 | 0.8232 | Reprovado |
-| `glaucia86/bug_to_user_story_v2` | 0.9333 | 1.0000 | 1.0000 | 0.8667 | 1.0000 | 0.9600 | Aprovado |
+| `glaucia86/bug_to_user_story_v2` | 0.9333 | 1.0000 | 1.0000 | 0.8667 | 1.0000 | 0.9600 | Em otimizacao (Clarity < 0.9) |
 
-### Evidencia de aprovacao
+### Evidencia da rodada atual
 
-Ultima execucao oficial:
+Ultima execucao diagnostica oficial:
 
 - Prompt: `glaucia86/bug_to_user_story_v2`
-- Media geral: `0.9600`
-- Resultado: `APROVADO (media >= 0.9)`
+- Media geral diagnostica: `0.9600`
+- Clarity: `0.8667`
+- Resultado: `REPROVADO no criterio estrito de >= 0.9 por metrica`
 
 ### Screenshots das avaliacoes
 
@@ -72,11 +85,11 @@ Resultado oficial desta rodada:
 
 ![Avaliacao v1 com notas baixas](docs/screenshots/avaliacao-v1-baixa-nota.png)
 
-#### Avaliacao v2 (aprovado)
+#### Avaliacao v2 (rodada atual)
 
 Resultado oficial desta rodada:
 - Media geral: 0.9600
-- Status: APROVADO
+- Status: Em otimizacao (Clarity abaixo de 0.9)
 
 ![Avaliacao v2 aprovado com media >= 0.9](docs/screenshots/avaliacao-v2-aprovado.png)
 
@@ -130,7 +143,7 @@ GOOGLE_API_KEY=...
 
 # opcional
 LANGSMITH_PROJECT=prompt-optimization-challenge
-MAX_EVAL_EXAMPLES=3
+MAX_EVAL_EXAMPLES=5
 ```
 
 ### 3) Pull do prompt base (v1)
@@ -162,16 +175,69 @@ python src/evaluate.py
 pytest tests/test_prompts.py -v
 ```
 
+### Exemplo no CLI
+
+```bash
+# Executar o pull dos prompts base (v1)
+python src/pull_prompts.py
+
+# Executar avaliacao inicial (baseline)
+python src/evaluate.py
+
+Executando avaliacao dos prompts...
+================================
+Prompt: leonanluppi/bug_to_user_story_v1
+- Helpfulness: 0.82
+- Correctness: 0.83
+- F1-Score: 0.82
+- Clarity: 0.81
+- Precision: 0.83
+================================
+Status: FALHOU - metricas abaixo do minimo de 0.9
+
+# Apos refatorar o prompt e fazer push
+python src/push_prompts.py
+
+# Executar avaliacao final (prompt otimizado)
+python src/evaluate.py
+
+Executando avaliacao dos prompts...
+================================
+Prompt: glaucia86/bug_to_user_story_v2
+- Helpfulness: 0.93
+- Correctness: 1.00
+- F1-Score: 1.00
+- Clarity: 0.86
+- Precision: 1.00
+================================
+Status: FALHOU - Clarity abaixo do minimo de 0.9
+```
+
 ## Evidencias no LangSmith
 
 Checklist recomendado para anexar no envio:
 
 - Link publico do dashboard
 - Execucoes do v1 com notas baixas
-- Execucoes do v2 com notas >= 0.9 (media geral)
+- Execucoes do v2 com as 4 metricas obrigatorias >= 0.9
 - Traces detalhados de pelo menos 3 exemplos
 
 Observacao: o dataset local oficial do repositorio base permanece em `datasets/bug_to_user_story.jsonl` e nao foi alterado.
+
+### Pacote de evidencias (arquivos locais)
+
+Arquivos gerados para facilitar a submissao final:
+
+- Checklist consolidado: `evidence/checklist/final_delivery_evidence_2026-03-06.md`
+- Log de testes: `evidence/logs/pytest_test_prompts_2026-03-06.txt`
+- Log de push: `evidence/logs/push_prompts_2026-03-06.txt`
+- Log de avaliacao rapida: `evidence/logs/evaluate_max_examples_1_2026-03-06.txt`
+
+Sugestao para fechamento da entrega:
+
+1. Rodar a avaliacao final com mais exemplos (`MAX_EVAL_EXAMPLES=5` ou `15`)
+2. Salvar o log em `evidence/logs/`
+3. Capturar screenshot correspondente no LangSmith e referenciar neste README
 
 ## Estrutura do projeto
 

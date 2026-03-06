@@ -401,6 +401,80 @@ bug_to_user_story_v2:
 
     ---
 
+    FEW-SHOT (CASOS NÃO CRÍTICOS)
+
+    Exemplo 1 - Validação simples:
+    Entrada:
+    "Campo de email aceita texto sem @, permitindo cadastros inválidos."
+
+    Saída esperada:
+    Como um usuário criando uma conta, eu quero que o sistema valide meu email corretamente, para que eu não insira um endereço inválido por engano.
+
+    Critérios de Aceitação:
+    - Dado que estou no formulário de cadastro
+    - Quando digito um email sem o caractere @
+    - Então devo ver uma mensagem de erro
+    - E não devo conseguir prosseguir com o cadastro
+    - E a mensagem deve explicar o formato correto
+
+    Exemplo 1.1 - Bug simples de fluxo de compra:
+    Entrada:
+    "Botão de adicionar ao carrinho não funciona no produto ID 1234."
+
+    Saída esperada:
+    Como um cliente navegando na loja, eu quero adicionar produtos ao meu carrinho de compras, para que eu possa continuar comprando e finalizar minha compra depois.
+
+    Critérios de Aceitação:
+    - Dado que estou visualizando o produto ID 1234
+    - Quando clico no botão "Adicionar ao Carrinho"
+    - Então o produto deve ser adicionado ao carrinho
+    - E devo ver uma confirmação visual
+    - E o contador do carrinho deve ser atualizado
+
+    Exemplo 2 - Integração com contexto técnico:
+    Entrada:
+    "Webhook de pagamento aprovado não está sendo chamado. Logs mostram HTTP 500 ao tentar POST /api/webhooks/payment."
+
+    Saída esperada:
+    Como o sistema de e-commerce, eu quero receber notificações de pagamento aprovado via webhook, para que o status dos pedidos seja atualizado automaticamente após confirmação do pagamento.
+
+    Critérios de Aceitação:
+    - Dado que um pagamento é aprovado no gateway
+    - Quando o gateway envia POST para /api/webhooks/payment
+    - Então o endpoint deve retornar HTTP 200
+    - E o status do pedido deve mudar de "pendente" para "aprovado"
+    - E o sistema deve logar o evento para auditoria
+
+    Contexto Técnico:
+    - Endpoint: POST /api/webhooks/payment
+    - Erro atual: HTTP 500 no processamento do webhook
+
+    Exemplo 2.1 - Performance mobile com contexto técnico estruturado:
+    Entrada:
+    "App Android trava ao carregar lista de notificações com mais de 50 itens. ANR em alguns casos. Lista não usa paginação e carrega tudo na Thread principal."
+
+    Saída esperada:
+    Como um usuário que depende de notificações em tempo real no app Android, eu quero abrir a tela de notificações sem travamentos, para que eu possa acompanhar eventos importantes sem interrupções.
+
+    Critérios de Aceitação:
+    - Dado que tenho mais de 50 notificações pendentes
+    - Quando abro a tela de notificações
+    - Então a lista deve carregar em até 2 segundos
+    - E não deve ocorrer congelamento da interface
+    - E não deve aparecer ANR
+    - E devo conseguir rolar a lista sem bloqueios
+
+    Critérios Técnicos:
+    - Implementar paginação com carregamento incremental (ex.: 20 itens por vez)
+    - Processar carregamento de dados fora da Thread principal
+    - Usar RecyclerView com ViewHolder para reduzir custo de renderização
+    - Implementar carregamento incremental ao scroll
+
+    Contexto do Bug:
+    - Problema atual: lista carregada de uma vez na Thread principal
+    - Sintoma: UI congelada por 5-10 segundos com ocorrência de ANR
+    - Condição crítica: falha mais frequente com 50+ notificações
+
     REGRAS GERAIS (quando não for CASO CRÍTICO 1, 2 ou 3)
     1. Sempre escreva a User Story no formato:
        "Como [tipo de usuário], eu quero [objetivo/capacidade], para que [benefício/resultado]."
@@ -410,12 +484,32 @@ bug_to_user_story_v2:
        - Quando...
        - Então...
        - E...
+       (foco em comportamento observável; evite detalhe de implementação nesta seção)
     4. Não invente detalhes que não estejam no relato do bug.
     5. Evite sinônimos desnecessários; prefira termos literais do bug report.
-    6. Inclua "Contexto Técnico:" somente quando o relato mencionar explicitamente endpoint HTTP, código HTTP, stack trace, logs de aplicação, webhook, API ou integração externa nomeada.
+    6. Inclua seções técnicas adicionais somente quando o relato mencionar sinais técnicos explícitos (ex.: endpoint HTTP, código HTTP, stack trace, logs, ANR, timeout, concorrência, memória, thread principal).
     7. Para bugs com múltiplos problemas críticos, use "=== USER STORY PRINCIPAL ===" e organize critérios por categoria.
     8. Saída em texto simples, sem cabeçalhos Markdown (##).
     9. Não escreva explicações do raciocínio. Entregue apenas o resultado final.
+    10. Para bugs simples e médios, use saída compacta e previsível nesta ordem:
+        a) User Story principal em uma única frase
+        b) Linha em branco
+        c) "Critérios de Aceitação:"
+        d) 4 a 6 critérios no formato Dado/Quando/Então/E
+        e) seções extras de contexto/técnica somente quando as regras 6, 20 e 22 forem atendidas
+    11. Evite redundância entre User Story e critérios; cada linha deve trazer informação nova.
+    12. Prefira frases curtas (uma ideia por linha), sem parágrafos longos.
+    13. Na frase "Como um...", descreva uma persona específica com contexto do bug; evite persona genérica (ex.: evite apenas "Como um usuário").
+    14. Nos critérios, prefira resultados observáveis pelo usuário e pelo teste; evite linguagem vaga ou excessivamente técnica (ex.: prefira "produto adicionado" a "requisição processada").
+    15. Sempre deixe exatamente uma linha em branco entre a User Story principal e "Critérios de Aceitação:".
+    16. Não inclua IDs, valores numéricos pontuais ou dados de ocorrência específica na frase principal da User Story; mantenha esses detalhes nos critérios de aceitação ou no contexto técnico.
+    17. Se o bug report trouxer identificadores específicos (ex.: ID do produto, endpoint, navegador, código HTTP), preserve esses detalhes em pelo menos um critério de aceitação ou em "Contexto Técnico:".
+    18. Não adicione critérios técnicos extras que não estejam no bug report ou na referência implícita do relato; mantenha foco no problema descrito.
+    19. Persona obrigatória de alta especificidade: use "Como um [papel] que [situação de uso]". Exemplo ruim: "Como um usuário do app Android". Exemplo bom: "Como um usuário que depende de notificações em tempo real no app Android".
+    20. Para bugs de performance/concurrency/memory/mobile crash (ex.: ANR, OOM, thread principal, timeout), inclua obrigatoriamente "Critérios Técnicos:" (3 a 5 bullets) e "Contexto do Bug:" (2 a 4 bullets).
+    21. Não misture solução técnica de baixo nível dentro de "Critérios de Aceitação" (ex.: Thread principal, RecyclerView, lock SQL, tuning de pool); esses itens devem ficar em "Critérios Técnicos:".
+    22. Para bugs de integração HTTP/webhook/API/logs, inclua "Contexto Técnico:" com endpoint, erro e condição de falha observada.
+    23. Mantenha exatamente uma linha em branco entre cada seção principal (User Story, Critérios de Aceitação e seções técnicas/contexto).
 
   user_prompt: |
     Converta o bug report abaixo em uma User Story de alta qualidade.
