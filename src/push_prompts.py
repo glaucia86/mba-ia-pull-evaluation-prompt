@@ -19,37 +19,89 @@ from utils import load_yaml, check_env_vars, print_section_header
 
 load_dotenv()
 
+LOCAL_PROMPT_PATH = "prompts/bug_to_user_story_v2.yml"
+PROMPT_KEY = "bug_to_user_story_v2"
 
-def push_prompt_to_langsmith(prompt_name: str, prompt_data: dict) -> bool:
+def build_prompt_from_yaml(prompt_data: dict) -> ChatPromptTemplate:
     """
-    Faz push do prompt otimizado para o LangSmith Hub (PÚBLICO).
+    Constrói um ChatPromptTemplate a partir dos dados do YAML.
 
     Args:
-        prompt_name: Nome do prompt
-        prompt_data: Dados do prompt
+        prompt_data: Dados do prompt extraídos do YAML
+
+    Returns:
+        ChatPromptTemplate construído
+    """
+    system_prompt = prompt_data.get("system_prompt", "")
+    user_prompt = prompt_data.get("user_prompt", "").strip()
+    
+    if not system_prompt:
+        raise ValueError("system_prompt não encontrado ou vazio no YAML.")
+    
+    if not user_prompt:
+        raise ValueError("user_prompt não encontrado ou vazio no YAML.")
+    
+    return ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            ("human", user_prompt),
+        ]
+    )
+
+def push_prompt_to_langsmith() -> bool:
+    """
+    Lê o YAML local e publica o prompt no LangSmith Hub.
 
     Returns:
         True se sucesso, False caso contrário
     """
-    ...
+    
+    print_section_header("PUSH DO PROMPT PARA O LANGSMITH")
+    
+    required_vars = [
+        "LANGSMITH_API_KEY",
+        "LANGSMITH_ENDPOINT",
+        "USERNAME_LANGSMITH_HUB",
+    ]
+    
+    if not check_env_vars(required_vars):
+        return False
+    
+    username = os.getenv("USERNAME_LANGSMITH_HUB") or ""
+    
+    yaml_data = load_yaml(LOCAL_PROMPT_PATH)
+    if not yaml_data:
+        print(f"❌ Não foi possível carregar o arquivo YAML: {LOCAL_PROMPT_PATH}")
+        return False
+    
+    prompt_block = yaml_data.get(PROMPT_KEY)
+    if not prompt_block:
+        print(f"❌ Chave '{PROMPT_KEY}' não encontrada no YAML.")
+        return False
 
-
-def validate_prompt(prompt_data: dict) -> tuple[bool, list]:
-    """
-    Valida estrutura básica de um prompt (versão simplificada).
-
-    Args:
-        prompt_data: Dados do prompt
-
-    Returns:
-        (is_valid, errors) - Tupla com status e lista de erros
-    """
-    ...
-
+    try:
+        prompt_template = build_prompt_from_yaml(prompt_block)
+        full_prompt_name = f"{username}/{PROMPT_KEY}"
+        
+        print(f"Publicando prompt para o LangSmith Hub: {full_prompt_name}")
+        
+        hub.push(
+            repo_full_name=full_prompt_name,
+            object=prompt_template,
+            new_repo_is_public=True,
+        )
+        
+        print(f"✅ Prompt publicado com sucesso, em: {full_prompt_name}!")
+        return True
+    
+    except Exception as e:
+        print(f"❌ Erro ao publicar o prompt: {e}")
+        return False
 
 def main():
     """Função principal"""
-    ...
+    success = push_prompt_to_langsmith()
+    return 0 if success else 1
 
 
 if __name__ == "__main__":
