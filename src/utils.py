@@ -7,10 +7,11 @@ import yaml
 import json
 import time
 import random
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import SecretStr
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
 load_dotenv()
 
@@ -343,6 +344,39 @@ def extract_json_from_response(response_text: str) -> Optional[Dict[str, Any]]:
                 pass
 
     return None
+
+
+def _normalize_model_name(model_name: str) -> str:
+    normalized = model_name.strip().lower()
+    if normalized.startswith("models/"):
+        normalized = normalized.split("/", 1)[1]
+    return normalized
+
+
+def _is_gemma_model_name(model_name: str) -> bool:
+    return _normalize_model_name(model_name).startswith("gemma")
+
+
+def prepare_messages_for_model(messages: List[BaseMessage], llm: Any) -> List[BaseMessage]:
+    """
+    Ajusta mensagens para modelos que não aceitam instruções de sistema nativamente.
+
+    No endpoint atual do Gemma via Google, mensagens de sistema geram erro
+    "Developer instruction is not enabled...". Neste caso, convertemos
+    SystemMessage para HumanMessage preservando o conteúdo.
+    """
+    model_name = str(getattr(llm, "model", "") or getattr(llm, "model_name", ""))
+    if not _is_gemma_model_name(model_name):
+        return messages
+
+    converted_messages: List[BaseMessage] = []
+    for message in messages:
+        if isinstance(message, SystemMessage):
+            converted_messages.append(HumanMessage(content=message.content))
+        else:
+            converted_messages.append(message)
+
+    return converted_messages
 
 
 def get_llm(model: Optional[str] = None, temperature: float = 0.0):

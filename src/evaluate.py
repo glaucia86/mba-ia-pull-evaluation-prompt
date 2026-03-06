@@ -25,6 +25,7 @@ from utils import (
     print_section_header,
     get_llm as get_configured_llm,
     invoke_with_retry,
+    prepare_messages_for_model,
 )
 from metrics import (
     evaluate_f1_score,
@@ -52,6 +53,14 @@ DIAGNOSTIC_METRICS = [
     "clarity",
     "precision",
 ]
+
+
+def env_to_bool(name: str, default: bool = False) -> bool:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+
+    return raw_value.strip().lower() in {"1", "true", "t", "yes", "y", "on"}
 
 
 def calculate_average(scores: Dict[str, float], metric_names: List[str]) -> float:
@@ -173,10 +182,11 @@ def evaluate_prompt_on_example(
         inputs = example.inputs if hasattr(example, "inputs") else {}
         outputs = example.outputs if hasattr(example, "outputs") else {}
 
-        chain = prompt_template | llm
+        prompt_value = prompt_template.invoke(inputs)
+        messages = prepare_messages_for_model(prompt_value.to_messages(), llm)
         response = invoke_with_retry(
-            chain,
-            inputs,
+            llm,
+            messages,
             operation_name="geracao de resposta",
         )
         answer = response.content
@@ -448,12 +458,18 @@ def main():
     print("Certifique-se de ter feito push do prompt antes de avaliar:")
     print("  python src/push_prompts.py\n")
 
-    prompts_to_evaluate = [
-        "leonanluppi/bug_to_user_story_v1",
-        f"{username}/bug_to_user_story_v2",
-    ]
-
     optimized_prompt_name = f"{username}/bug_to_user_story_v2"
+    include_baseline = env_to_bool("EVALUATE_BASELINE_PROMPT", default=False)
+
+    prompts_to_evaluate = [optimized_prompt_name]
+    if include_baseline:
+        prompts_to_evaluate.insert(0, "leonanluppi/bug_to_user_story_v1")
+
+    if include_baseline:
+        print("Modo de avaliação: baseline + prompt otimizado")
+    else:
+        print("Modo de avaliação: apenas prompt otimizado (v2)")
+
     optimized_passed = True
     evaluated_count = 0
     results_summary = []
@@ -479,7 +495,6 @@ def main():
 
         except Exception as e:
             print(f"\n❌ Falha ao avaliar '{prompt_name}': {e}")
-            all_passed = False
 
             results_summary.append(
                 {

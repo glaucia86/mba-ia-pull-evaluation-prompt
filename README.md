@@ -36,8 +36,8 @@ As metricas F1-Score, Clarity e Precision permanecem como diagnostico para itera
 
 ### Dashboard e links publicos
 
-- Dashboard do projeto no LangSmith: https://smith.langchain.com/projects/prompt-optimization-challenge
-- Prompt otimizado publicado: https://smith.langchain.com/hub/glaucia86/bug_to_user_story_v2
+- Dashboard do projeto no LangSmith: [https://smith.langchain.com/projects/prompt-optimization-challenge](https://smith.langchain.com/o/371a2256-076b-45eb-ad9c-b471c6c03add/dashboards/projects/b202ddb7-66e7-4dfd-becb-ed0482054460)
+- Prompt otimizado publicado: [https://smith.langchain.com/hub/glaucia86/bug_to_user_story_v2](https://smith.langchain.com/hub/glaucia86/bug_to_user_story_v2?organizationId=371a2256-076b-45eb-ad9c-b471c6c03add)
 
 ### Tabela comparativa diagnostica (prompt ruim v1 vs prompt otimizado v2)
 
@@ -144,6 +144,7 @@ GOOGLE_API_KEY=...
 # opcional
 LANGSMITH_PROJECT=prompt-optimization-challenge
 MAX_EVAL_EXAMPLES=5
+EVALUATE_BASELINE_PROMPT=false
 ```
 
 ### 3) Pull do prompt base (v1)
