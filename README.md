@@ -124,8 +124,9 @@ A melhor rodada documentada durante a iteração foi obtida com modelos Gemini e
 
 ## Evidências Visuais
 
-> Links públicos: [prompt-optimization-challenge](https://smith.langchain.com/o/371a2256-076b-45eb-ad9c-b471c6c03add/projects/p/b202ddb7-66e7-4dfd-becb-ed0482054460?timeModel=%7B%22duration%22%3A%221d%22%7D)
-> Dashboard: [prompt-optimization-challenge](https://smith.langchain.com/o/371a2256-076b-45eb-ad9c-b471c6c03add/dashboards/projects/b202ddb7-66e7-4dfd-becb-ed0482054460)
+> **Links públicos:** [prompt-optimization-challenge](https://smith.langchain.com/o/371a2256-076b-45eb-ad9c-b471c6c03add/projects/p/b202ddb7-66e7-4dfd-becb-ed0482054460?timeModel=%7B%22duration%22%3A%221d%22%7D)
+
+> **Dashboard**: [prompt-optimization-challenge](https://smith.langchain.com/o/371a2256-076b-45eb-ad9c-b471c6c03add/dashboards/projects/b202ddb7-66e7-4dfd-becb-ed0482054460)
 
 ### Dashboard e checkpoint principal
 
