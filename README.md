@@ -299,20 +299,26 @@ Para envio final, o ideal é anexar as capturas existentes e usar o checklist lo
 
 ## Sobre Mim
 
-Sou A.I Developer trabalhando principalmente com **TypeScript/Node.js** e ecossistema **Azure**. Atualmente cursando MBA em Engenharia de Software com IA pela FullCycle.
-
-Nos últimos anos concentrei minha produção técnica na interseção entre desenvolvimento de software e IA generativa: construí servidores MCP (Model Context Protocol), pipelines RAG com LangChain.js + Gemini, aplicações agenticas com GitHub Copilot SDK e cursos gratuitos de AI para a comunidade brasileira.
-
-Alguns repositórios que refletem esse caminho:
-
-| Projeto | Descrição | ★ |
-|---|---|---:|
-| [ai-js-course](https://github.com/glaucia86/ai-js-course) | Curso gratuito de AI com JavaScript/TypeScript | 114 |
-| [microblog-ai-nextjs](https://github.com/glaucia86/microblog-ai-nextjs) | Microblog com geração inteligente de conteúdo via IA | 112 |
-| [weather-mcp-server](https://github.com/glaucia86/weather-mcp-server) | MCP Server robusto em TypeScript para dados climáticos | 98 |
-| [repocheckai](https://github.com/glaucia86/repocheckai) | CLI agêntica para análise de saúde de repositórios GitHub | 90 |
-| [rag-search-ingestion-langchainjs-gemini](https://github.com/glaucia86/rag-search-ingestion-langchainjs-gemini) | Pipeline RAG com LangChain.js + Gemini + Docker | 75 |
-
-Este projeto de engenharia de prompts faz parte desse conjunto de estudos práticos — onde o foco não é só fazer funcionar, mas entender e medir o que muda quando se ajusta um prompt com método.
-
-GitHub: [@glaucia86](https://github.com/glaucia86) · LangSmith Hub: [`glaucia86`](https://smith.langchain.com/hub/glaucia86)
+<div align="center">
+  <img src="https://github.com/glaucia86.png" width="100" alt="Glaucia Lemos"/>
+  <br/><br/>
+  <strong>Glaucia Lemos</strong>
+  <br/>
+  <sub>A.I Developer Specialist &nbsp;·&nbsp; Microsoft MVP — Web Technologies</sub>
+  <br/><br/>
+  <a href="https://github.com/glaucia86">
+    <img src="https://img.shields.io/badge/GitHub-%40glaucia86-181717?logo=github&logoColor=white" alt="GitHub"/>
+  </a>
+  &nbsp;
+  <a href="https://www.linkedin.com/in/glaucialemos/">
+    <img src="https://img.shields.io/badge/LinkedIn-Glaucia%20Lemos-0a66c2?logo=linkedin&logoColor=white" alt="LinkedIn"/>
+  </a>
+  &nbsp;
+  <a href="https://x.com/glaucia_lemos86">
+    <img src="https://img.shields.io/badge/X-%40glaucia__lemos86-000000?logo=x&logoColor=white" alt="X (Twitter)"/>
+  </a>
+  &nbsp;
+  <a href="https://mvp.microsoft.com/pt-BR/MVP/profile/d3200941-395d-423b-a0ec-eb0577d3bb86">
+    <img src="https://img.shields.io/badge/Microsoft%20MVP-Web%20Technologies-0078d4?logo=microsoft&logoColor=white" alt="Microsoft MVP"/>
+  </a>
+</div>
