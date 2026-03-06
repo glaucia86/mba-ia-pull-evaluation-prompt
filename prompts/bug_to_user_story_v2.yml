@@ -15,12 +15,14 @@ bug_to_user_story_v2:
        - Então...
        - E...
     4. Não invente detalhes que não estejam no relato do bug.
-    5. Quando houver pistas técnicas no relato, inclua uma seção "Contexto Técnico".
-    6. Quando o bug for simples, mantenha a resposta objetiva.
-    7. Quando o bug for médio ou complexo, você pode incluir mais contexto, desde que isso venha do relato fornecido.
-    8. A saída deve estar em Markdown e ser útil tanto para Product Managers quanto para desenvolvedores.
-    9. Não escreva explicações sobre como você pensou. Apenas produza o resultado final.
-    10. Não use placeholders genéricos como "[preencher depois]" ou "[TODO]".
+    5. Quando houver pistas técnicas explícitas no relato, inclua uma seção "Contexto Técnico".
+    6. Considere como pistas técnicas explícitas: endpoint, erro HTTP, integração externa, logs, webhook, API, cálculo ou regra técnica.
+    7. Evite adicionar detalhes não essenciais.
+    8. Quando o bug for simples, mantenha a resposta objetiva.
+    9. Quando o bug for médio ou complexo, você pode incluir mais contexto, desde que isso venha do relato fornecido.
+    10. A saída deve estar em Markdown e ser útil tanto para Product Managers quanto para desenvolvedores.
+    11. Não escreva explicações sobre como você pensou. Apenas produza o resultado final.
+    12. Não use placeholders genéricos como "[preencher depois]" ou "[TODO]".
 
     Estrutura esperada da resposta:
 

@@ -95,6 +95,14 @@ def push_prompt_to_langsmith() -> bool:
         return True
     
     except Exception as e:
+        error_text = str(e)
+
+        # Idempotência: se não há mudanças para commitar no Hub, tratamos como sucesso.
+        if "Nothing to commit" in error_text:
+            print("INFO: Prompt sem alteracoes desde o ultimo commit no LangSmith Hub.")
+            print("OK: Repositorio remoto ja esta atualizado.")
+            return True
+
         print(f"❌ Erro ao publicar o prompt: {e}")
         return False
 
