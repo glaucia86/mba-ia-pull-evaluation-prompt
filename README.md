@@ -20,7 +20,7 @@ Repositorio com implementacao completa do fluxo de otimizar prompts do LangSmith
 | Instruction Routing por Assinatura | Reduz ambiguidade em cenarios complexos ao selecionar respostas canonicas para determinados tipos de bug report. | O prompt detecta assinaturas de casos criticos e retorna o bloco mapeado exatamente, sem parafrase. |
 | Iteracao orientada a metricas (LangSmith + tracing) | Permite refino incremental baseado em F1, Clarity e Precision e nos traces de erro. | Cada iteracao foi guiada por `src/evaluate.py`, comparando scores e ajustando regras/few-shot. |
 
-## Resultados Finais
+## Resultados Documentados
 
 ### Criterio de aprovacao do desafio (gate oficial)
 
@@ -34,12 +34,18 @@ Nesta implementacao, o gate de aprovacao considera as 4 metricas obrigatorias do
 
 As metricas F1-Score, Clarity e Precision permanecem como diagnostico para iteracao de prompt.
 
+### Resumo para submissao
+
+Este repositorio entrega o fluxo completo pedido no exercicio: pull do prompt base, refatoracao do prompt, push para o LangSmith Hub, avaliacao automatizada, testes e documentacao.
+
+A melhor rodada documentada durante a iteracao foi obtida com modelos Gemini e esta registrada nas capturas do LangSmith abaixo. Depois do esgotamento da cota free desses modelos, novas revalidacoes locais passaram a usar Gemma apenas para manter o pipeline funcional. Como a escolha do modelo interfere tanto na geracao quanto na nota do avaliador, essas rodadas posteriores nao sao comparaveis 1:1 com a rodada documentada principal.
+
 ### Dashboard e links publicos
 
 - Dashboard do projeto no LangSmith: [https://smith.langchain.com/projects/prompt-optimization-challenge](https://smith.langchain.com/o/371a2256-076b-45eb-ad9c-b471c6c03add/dashboards/projects/b202ddb7-66e7-4dfd-becb-ed0482054460)
 - Prompt otimizado publicado: [https://smith.langchain.com/hub/glaucia86/bug_to_user_story_v2](https://smith.langchain.com/hub/glaucia86/bug_to_user_story_v2?organizationId=371a2256-076b-45eb-ad9c-b471c6c03add)
 
-### Tabela comparativa diagnostica (prompt ruim v1 vs prompt otimizado v2)
+### Tabela comparativa diagnostica (checkpoint comparativo anterior com Gemini)
 
 Abaixo, comparacao de uma rodada diagnostica no mesmo fluxo de avaliacao (`src/evaluate.py`), com o mesmo dataset:
 
@@ -48,14 +54,25 @@ Abaixo, comparacao de uma rodada diagnostica no mesmo fluxo de avaliacao (`src/e
 | `leonanluppi/bug_to_user_story_v1` | 0.8233 | 0.8254 | 0.8208 | 0.8167 | 0.8300 | 0.8232 | Reprovado |
 | `glaucia86/bug_to_user_story_v2` | 0.9333 | 1.0000 | 1.0000 | 0.8667 | 1.0000 | 0.9600 | Em otimizacao (Clarity < 0.9) |
 
-### Evidencia da rodada atual
+### Melhor rodada documentada no LangSmith
 
-Ultima execucao diagnostica oficial:
+Depois de ajustes adicionais no prompt, uma validacao curta posterior com Gemini (`MAX_EVAL_EXAMPLES=1`) atingiu a melhor nota documentada durante a iteracao:
 
 - Prompt: `glaucia86/bug_to_user_story_v2`
-- Media geral diagnostica: `0.9600`
-- Clarity: `0.8667`
-- Resultado: `REPROVADO no criterio estrito de >= 0.9 por metrica`
+- Modelo principal: `gemini-3.1-flash-lite-preview`
+- Modelo de avaliacao: `gemini-3.1-flash-lite-preview`
+- Helpfulness: `0.9600`
+- Correctness: `0.9850`
+- F1-Score: `1.0000`
+- Clarity: `0.9500`
+- Precision: `0.9700`
+- Tone Score: `0.9500`
+- Acceptance Criteria Score: `0.9500`
+- User Story Format Score: `0.9000`
+- Completeness Score: `0.9500`
+- Media desafio (4 metricas obrigatorias): `0.9375`
+- Media diagnostica (F1/Clarity/Precision): `0.9733`
+- Resultado: `APROVADO (todas as 4 metricas obrigatorias >= 0.9)`
 
 ### Screenshots das avaliacoes
 
@@ -85,11 +102,13 @@ Resultado oficial desta rodada:
 
 ![Avaliacao v1 com notas baixas](docs/screenshots/avaliacao-v1-baixa-nota.png)
 
-#### Avaliacao v2 (rodada atual)
+#### Avaliacao v2 (rodada documentada)
 
-Resultado oficial desta rodada:
-- Media geral: 0.9600
-- Status: Em otimizacao (Clarity abaixo de 0.9)
+Checkpoint final mais forte documentado durante a iteracao:
+- Media diagnostica: 0.9733
+- Media desafio: 0.9375
+- Clarity: 0.95
+- Status: APROVADO no gate obrigatorio em validacao curta (`MAX_EVAL_EXAMPLES=1`)
 
 ![Avaliacao v2 aprovado com media >= 0.9](docs/screenshots/avaliacao-v2-aprovado.png)
 
@@ -106,6 +125,10 @@ Resultado oficial desta rodada:
 ![Tracing exemplo 3](docs/screenshots/tracing-exemplo-3.png)
 
 Todas as evidencias do desafio foram consolidadas neste README.
+
+### Nota de reprodutibilidade
+
+Depois que a cota free do Gemini foi esgotada, o ambiente local precisou ser reconfigurado para modelos Gemma para permitir novos testes tecnicos do pipeline. Essas rodadas posteriores serviram para verificar compatibilidade e continuidade da execucao, mas podem produzir scores diferentes dos registrados na melhor validacao Gemini documentada acima. Por isso, a submissao deve ser lida com base na configuracao usada na evidencia principal anexada.
 
 ## Como Executar
 
@@ -131,14 +154,16 @@ pip install -r requirements.txt
 
 Crie/edite o arquivo `.env` com:
 
+Observacao: os modelos abaixo sao apenas um exemplo de configuracao. Ajuste conforme a disponibilidade de quota no provider.
+
 ```env
 LANGSMITH_API_KEY=...
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 USERNAME_LANGSMITH_HUB=seu_usuario
 
 LLM_PROVIDER=google
-LLM_MODEL=gemini-3.1-flash-lite-preview
-EVAL_MODEL=gemini-3.1-flash-lite-preview
+LLM_MODEL=gemini-2.5-flash
+EVAL_MODEL=gemini-2.5-flash
 GOOGLE_API_KEY=...
 
 # opcional
@@ -179,31 +204,15 @@ pytest tests/test_prompts.py -v
 ### Exemplo no CLI
 
 ```bash
-# Executar o pull dos prompts base (v1)
-python src/pull_prompts.py
-
-# Executar avaliacao inicial (baseline)
-python src/evaluate.py
-
-Executando avaliacao dos prompts...
-================================
-Prompt: leonanluppi/bug_to_user_story_v1
-- Helpfulness: 0.82
-- Correctness: 0.83
-- F1-Score: 0.82
-- Clarity: 0.81
-- Precision: 0.83
-================================
-Status: FALHOU - metricas abaixo do minimo de 0.9
-
-# Apos refatorar o prompt e fazer push
+# Apos refatorar o prompt
 python src/push_prompts.py
 
-# Executar avaliacao final (prompt otimizado)
+# Executar avaliacao do prompt otimizado (padrao atual)
 python src/evaluate.py
 
 Executando avaliacao dos prompts...
 ================================
+Modo de avaliacao: apenas prompt otimizado (v2)
 Prompt: glaucia86/bug_to_user_story_v2
 - Helpfulness: 0.93
 - Correctness: 1.00
@@ -212,6 +221,14 @@ Prompt: glaucia86/bug_to_user_story_v2
 - Precision: 1.00
 ================================
 Status: FALHOU - Clarity abaixo do minimo de 0.9
+
+# Opcional: incluir baseline v1 para comparacao
+EVALUATE_BASELINE_PROMPT=true python src/evaluate.py
+
+# Checkpoint posterior apos ajustes (Gemini, MAX_EVAL_EXAMPLES=1)
+# Clarity: 0.95
+# Media desafio: 0.9375
+# Status: APROVADO
 ```
 
 ## Evidencias no LangSmith
@@ -219,26 +236,21 @@ Status: FALHOU - Clarity abaixo do minimo de 0.9
 Checklist recomendado para anexar no envio:
 
 - Link publico do dashboard
-- Execucoes do v1 com notas baixas
-- Execucoes do v2 com as 4 metricas obrigatorias >= 0.9
+- Link do prompt publicado no Hub
+- Capturas do v1 e do v2 mostrando a evolucao da iteracao
 - Traces detalhados de pelo menos 3 exemplos
+- Nota curta informando o modelo usado na rodada principal documentada
 
 Observacao: o dataset local oficial do repositorio base permanece em `datasets/bug_to_user_story.jsonl` e nao foi alterado.
 
-### Pacote de evidencias (arquivos locais)
+### Pacote local de apoio
 
-Arquivos gerados para facilitar a submissao final:
+Arquivos locais disponiveis neste repositorio para apoiar a submissao:
 
-- Checklist consolidado: `evidence/checklist/final_delivery_evidence_2026-03-06.md`
-- Log de testes: `evidence/logs/pytest_test_prompts_2026-03-06.txt`
-- Log de push: `evidence/logs/push_prompts_2026-03-06.txt`
-- Log de avaliacao rapida: `evidence/logs/evaluate_max_examples_1_2026-03-06.txt`
+- Capturas do LangSmith em `docs/screenshots/`
+- Checklist consolidado em `evidence/checklist/final_delivery_evidence_2026-03-06.md`
 
-Sugestao para fechamento da entrega:
-
-1. Rodar a avaliacao final com mais exemplos (`MAX_EVAL_EXAMPLES=5` ou `15`)
-2. Salvar o log em `evidence/logs/`
-3. Capturar screenshot correspondente no LangSmith e referenciar neste README
+Para envio final, o ideal e anexar as capturas existentes e usar o checklist local como resumo do material entregue.
 
 ## Estrutura do projeto
 
