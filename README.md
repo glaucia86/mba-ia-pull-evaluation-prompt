@@ -309,15 +309,15 @@ Para envio final, o ideal é anexar as capturas existentes e usar o checklist lo
   <a href="https://github.com/glaucia86">
     <img src="https://img.shields.io/badge/GitHub-%40glaucia86-181717?logo=github&logoColor=white" alt="GitHub"/>
   </a>
-  &nbsp;
+
   <a href="https://www.linkedin.com/in/glaucialemos/">
     <img src="https://img.shields.io/badge/LinkedIn-Glaucia%20Lemos-0a66c2?logo=linkedin&logoColor=white" alt="LinkedIn"/>
   </a>
-  &nbsp;
+
   <a href="https://x.com/glaucia_lemos86">
     <img src="https://img.shields.io/badge/X-%40glaucia__lemos86-000000?logo=x&logoColor=white" alt="X (Twitter)"/>
   </a>
-  &nbsp;
+
   <a href="https://mvp.microsoft.com/pt-BR/MVP/profile/d3200941-395d-423b-a0ec-eb0577d3bb86">
     <img src="https://img.shields.io/badge/Microsoft%20MVP-Web%20Technologies-0078d4?logo=microsoft&logoColor=white" alt="Microsoft MVP"/>
   </a>
